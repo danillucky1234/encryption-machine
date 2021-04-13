@@ -3,3 +3,4 @@ encrypte_methods.cpp
 decrypte_methods.cpp
 encryption-machine
 .vscode/
+test/

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "caesar_modified.h"
+#include "ciphers/caesar/caesar_modified.h"
 // #include "rsa.h"
 // #include "hill.h"
 
@@ -235,6 +235,7 @@ std::string getCipherMethodFromUser()
 		
 		std::cout << "Enter the option:\n" + CColors::RED + "\t[>] " + CColors::WHITE;
 		std::cin >> tmpStr;
+		std::cin.ignore(1, '\n');
 		try
 		{
 			cipherNumber = std::stoi(tmpStr);
@@ -262,9 +263,7 @@ std::string getKeywordFromUser()
 	std::string keyword;
 	std::cout << CColors::GREEN + "[+] " + CColors::BLUE + "Enter the keyword (it could be a phrase or the number (if the cipher method is caesar\'s-modified)): \n" + CColors::WHITE;
 	std::cout << CColors::RED + "\t[>] " + CColors::WHITE;
-	std::cin.ignore(1, '\n');
 	std::getline(std::cin, keyword);
-
 	return keyword;
 }
 
@@ -273,7 +272,6 @@ std::string getMessageFromUser()
 	std::string message;
 	std::cout << CColors::GREEN + "[+] " + CColors::BLUE + "Enter the message (it could be a phrase): \n" + CColors::WHITE;
 	std::cout << CColors::RED + "\t[>] " + CColors::WHITE;
-	std::cin.ignore(1, '\n');
 	std::getline(std::cin, message);
 	return message;
 }
@@ -312,7 +310,7 @@ void parseArguments(const std::vector<std::string>& vec)
 						throw possibleException; // we throw std::string
 					}
 					// check file is it empty
-					if(fileIsEmpty(file))
+					if(!fileIsEmpty(file))
 					{
 						CommandLineArguments::inputFilePath = vec[i + 1];
 					}
