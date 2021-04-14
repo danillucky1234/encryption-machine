@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <map>
 #include <vector>
 #include <cstring>
 #include <sys/stat.h>   // for func that checks if the file exists

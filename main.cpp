@@ -1,19 +1,16 @@
 #include "stdafx.h"
 #include "ciphers/caesar/caesar_modified.h"
-// #include "rsa.h"
-// #include "hill.h"
-
+#include "ciphers/ctc/ctc.h"
 
 void printStartMessageTitle();									// print the title 'Encrypt machine'
 void parseArguments(const std::vector<std::string>& vec);		// take all the arguments and turn them into options
 inline bool exists_test (const std::string& name);				// check - does this file exist or not?
 bool fileIsEmpty(std::ifstream& pFile);							// check - does file is empty or not?
-bool checkQuietOptionForValidity();									// check - does all used options valid or not?
+bool checkQuietOptionForValidity();								// check - does all used options valid or not?
 std::string getCipherMethodFromUser();							// if options aren't specified, we ask the user which cipher he wants to use
 std::string getKeywordFromUser();								// if the cipher requires the key - we can ask the key from user using this func
 std::string getMessageFromUser();								// if the user doesn't specified '-m' or '-i' option, we should ask the message from user
 void printHelpMessage();										// help message
-
 
 int main(int argc, char** argv)
 {
@@ -116,7 +113,8 @@ int main(int argc, char** argv)
 	// and return the decrypted/encrypted string 
 	// after this manipulation we print the string in the terminal or put it in the output file
 
-	std::string (*cipherFunction)(bool, std::string, std::string);
+	std::string (*cipherFunction)(const bool&, const std::string&, const std::string&);
+
 
 	if ( !strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[0].c_str()))
 	{
@@ -124,7 +122,7 @@ int main(int argc, char** argv)
 	}
 	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[1].c_str()))
 	{
-		// (*cipherFunction) = rsa;
+		cipherFunction = ctc;
 	}
 	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[2].c_str()))
 	{
@@ -135,7 +133,16 @@ int main(int argc, char** argv)
 		// (*cipherFunction) = hill;
 	}
 
-	std::string returnedString = cipherFunction(CommandLineArguments::bDecrypt, messageToTheFunction, CommandLineArguments::keyword);
+	std::string returnedString;
+	try
+	{
+		returnedString = cipherFunction(CommandLineArguments::bDecrypt, messageToTheFunction, CommandLineArguments::keyword);
+	}
+	catch(const std::string& ex)
+	{
+		std::cout << CColors::RED + ex + CColors::WHITE << '\n';
+		return 0;
+	}
 
 	// if user used '-o' option, we should write returnedString to this file
 	if (CommandLineArguments::outputFilePath.length() != 0)
@@ -229,7 +236,7 @@ std::string getCipherMethodFromUser()
 		// These choices must be in the same order as the strings in the namesOfTheCiphersWhichAllowed vector
 		std::cout << CColors::BLUE + "What cipher will we use:\n";
 		std::cout << CColors::GREEN + "\t[0] " + CColors::BLUE + "Caesar\'s\n" + CColors::WHITE;
-		std::cout << CColors::GREEN + "\t[1] " + CColors::BLUE + "RSA\n" + CColors::WHITE;
+		std::cout << CColors::GREEN + "\t[1] " + CColors::BLUE + "Column Transposition\n" + CColors::WHITE;
 		std::cout << CColors::GREEN + "\t[2] " + CColors::BLUE + "Caesar\'s modified\n" + CColors::WHITE;
 		std::cout << CColors::GREEN + "\t[3] " + CColors::BLUE + "Hill\'s\n\n" + CColors::WHITE;
 		
@@ -319,6 +326,7 @@ void parseArguments(const std::vector<std::string>& vec)
 						possibleException = static_cast<std::string>("The input file is empty!");
 						throw possibleException; // we throw std::string
 					}
+					file.close();
 				}
 				else
 				{
@@ -342,18 +350,21 @@ void parseArguments(const std::vector<std::string>& vec)
 			std::string possibleException;
 			try
 			{
-				// we don't check output file exists, because we can create file in those filepath
-				// but we should check permissions, can we create and write smth in the inputed folder
-				struct stat statv;
-				if (lstat(vec.at(i + 1).c_str(), &statv) == -1)
+				std::ofstream file;
+				file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+				try
 				{
-					possibleException = static_cast<std::string>("Sorry, we don\'t have permissions to create\\write the smth in the inputed folder\n");
-					throw possibleException;
+					file.open(vec[i + 1], std::ios::out | std::ios::trunc);
 				}
-				else
+				catch(const std::ifstream::failure& ex)
 				{
-					CommandLineArguments::outputFilePath = vec.at(i + 1);
+            		std::cerr << "Error code: " << ex.what() << '\n';
+					possibleException = static_cast<std::string>("Error while opening the output file! Maybe we don\'t have permissions to create\\write the smth in the inputed folder\n");
+					throw possibleException; // we throw std::string
 				}
+				
+				CommandLineArguments::outputFilePath = vec.at(i + 1);
+				file.close();
 			}
 			catch(const std::string& ex)
 			{
@@ -415,6 +426,7 @@ void parseArguments(const std::vector<std::string>& vec)
 		else if ( !strcmp(vec[i].c_str(), "-h") || !strcmp(vec[i].c_str(), "--help") )
 		{
 			CommandLineArguments::bHelp = true;
+			break;
 		}
 	}
 }
@@ -478,17 +490,19 @@ void printHelpMessage()
 	std::cout << "\t\t\t\t\t\t\t\t\t4) -k(--keyword)\n\n";
 	
 
+	std::cout << CColors::RED + "All ciphers which you can use:\n" + CColors::WHITE;
+	std::cout << "\t- caesar\n";
+	std::cout << "\t- ctc\n";
+	std::cout << "\t- caesar-modified\n";
+	std::cout << "\t- hill\n\n";
+
 	std::cout << CColors::BLUE + "Note:\t If you use a caesar-modified cipher, use a number instead of the key to set the shift. For example:\n" + CColors::WHITE;
 	std::cout << "./encryption-machine -c caesar-modified -k 5 -o encryptedMessage.txt -i inputCaesarCipher.txt\n";
 	std::cout << CColors::BLUE + "If you write a word or phrase in the keyword instead of a number, a shift will be used with the size of the number of characters in the string\n\n" + CColors::WHITE;
 	
 	std::cout << CColors::BLUE + "Note 2:\t All cipher names are written in small letters\n\n" + CColors::WHITE;
 
-	std::cout << CColors::RED + "All ciphers which you can use:\n" + CColors::WHITE;
-	std::cout << "\t- caesar\n";
-	std::cout << "\t- rsa\n";
-	std::cout << "\t- caesar-modified\n";
-	std::cout << "\t- hill\n";
+	std::cout << CColors::BLUE + "Note 3:\t ctc stands for column transposition cipher\n\n" + CColors::WHITE;
 
 	std::cout << '\n';
 

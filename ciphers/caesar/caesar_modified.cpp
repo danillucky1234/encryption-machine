@@ -1,6 +1,6 @@
 #include "caesar_modified.h"
 
-std::string caesar_modified(bool bDecrypt, std::string message, std::string keyword)
+std::string caesar_modified(const bool& bDecrypt, const std::string& message, const std::string& keyword)
 {
     int shift;
     // trying to convert string to int
