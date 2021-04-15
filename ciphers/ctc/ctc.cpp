@@ -54,7 +54,7 @@ std::string encrypt_ctc(const std::string& message, const std::string& keyword, 
     {
         for (int j = 0; j < col; ++j)
         {
-            matrix[i][j] = message[k];
+            *(*(matrix + i) + j) = message[k];
             
             if (message[k] == '\0') 
             {
@@ -62,7 +62,7 @@ std::string encrypt_ctc(const std::string& message, const std::string& keyword, 
                 {
                     for (int l = j; l < col; ++l)
                     {
-                        matrix[k][l] = '_';
+                        *(*(matrix + k) + l) = '_';
                     }
                 }
                 break;                
@@ -79,7 +79,7 @@ std::string encrypt_ctc(const std::string& message, const std::string& keyword, 
         // getting the encrypted text from the matrix column using permutated key
         for (int i = 0; i < row; ++i)
         {
-            encryptedString += matrix[i][j];
+            encryptedString += *(*(matrix + i) + j);
         }
     }
     return encryptedString;
@@ -114,7 +114,7 @@ std::string decrypt_ctc(const std::string& message, const std::string& keyword, 
     {
         for (int j = 0; j < col; ++j)
         {
-            cipherMat[i][j] = message[k++];
+            *(*(cipherMat + i) + j) = message[k++];
         }
     }
 
@@ -126,7 +126,7 @@ std::string decrypt_ctc(const std::string& message, const std::string& keyword, 
     {
         for (int j = 0; j < col; ++j)
         {
-            decryptedMatrix[keyMap[i].second][j] = cipherMat[i][j];
+            *(*(decryptedMatrix + keyMap[i].second) + j) = *(*(cipherMat + i) + j);
         }
     }
 
@@ -136,7 +136,7 @@ std::string decrypt_ctc(const std::string& message, const std::string& keyword, 
         {
             if (decryptedMatrix[i][j] != '_')
             {
-                decryptedString += decryptedMatrix[i][j];
+                decryptedString += *(*(decryptedMatrix + i) + j);
             }
         }
     }

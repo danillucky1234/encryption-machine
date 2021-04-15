@@ -2,6 +2,22 @@
 #include "ciphers/caesar/caesar_modified.h"
 #include "ciphers/ctc/ctc.h"
 
+namespace CommandLineArguments
+{
+    // string vars
+    std::string inputFilePath   = "";
+    std::string outputFilePath  = "";
+    std::string keyword         = "";
+    std::string cipherMethod    = "";
+    std::string message         = "";
+
+    // bool vars
+    bool bDecrypt                = false;    // if no '-d' parameter is specified, we will encrypt the file
+    bool bQuiet                  = false;    // originally we will print some messages
+    bool bHelp                   = false;    // should we print the help message or not
+    bool bBrute                  = false;    // bruteforce for caesar-modified cipher
+}
+
 void printStartMessageTitle();									// print the title 'Encrypt machine'
 void parseArguments(const std::vector<std::string>& vec);		// take all the arguments and turn them into options
 inline bool exists_test (const std::string& name);				// check - does this file exist or not?

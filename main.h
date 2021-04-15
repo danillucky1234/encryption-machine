@@ -10,22 +10,6 @@ namespace CColors
     const std::string WHITE	= "\033[0m";  
 }
 
-namespace CommandLineArguments
-{
-    // string vars
-    static std::string inputFilePath   = "";
-    static std::string outputFilePath  = "";
-    static std::string keyword         = "";
-    static std::string cipherMethod    = "";
-    static std::string message         = "";
-
-    // bool vars
-    static bool bDecrypt                = false;    // if no '-d' parameter is specified, we will encrypt the file
-    static bool bQuiet                  = false;    // originally we will print some messages
-    static bool bHelp                   = false;    // should we print the help message or not
-    static bool bBrute                  = false;    // bruteforce for caesar-modified cipher
-}
-
 const std::vector<std::string> namesOfTheCiphersWhichAreAllowed = {"caesar", "ctc", "caesar-modified", "hill"};
 
 const std::vector<char> englishAlphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
