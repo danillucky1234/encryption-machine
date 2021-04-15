@@ -17,7 +17,7 @@ std::string ctc(const bool& bDecrypt, const std::string& message, const std::str
 
     std::string returnedString;
 
-    std::map<int, int> keyMap = getPermutationOrder(keyword);
+    std::vector<std::pair<int, int>> keyMap = getPermutationOrder(keyword);
 
     if(bDecrypt)
     {
@@ -33,7 +33,7 @@ std::string ctc(const bool& bDecrypt, const std::string& message, const std::str
     return returnedString;
 }
 
-std::string encrypt_ctc(const std::string& message, const std::string& keyword, const std::map<int, int>& keyMap)
+std::string encrypt_ctc(const std::string& message, const std::string& keyword, const std::vector<std::pair<int, int>>& keyMap)
 {
     std::string encryptedString;
 
@@ -52,22 +52,21 @@ std::string encrypt_ctc(const std::string& message, const std::string& keyword, 
 
     for (int i = 0, k = 0; i < row; ++i)
     {
-        for (int j =0; j < col; /* */)
+        for (int j = 0; j < col; ++j)
         {
-            if (message[k] == '\0')
+            matrix[i][j] = message[k];
+            
+            if (message[k] == '\0') 
             {
-                // adding the '_' symbol
-                matrix[i][j] = '_';
-                ++j;
+                for (int k = i; k < row; ++k)
+                {
+                    for (int l = j; l < col; ++l)
+                    {
+                        matrix[k][l] = '_';
+                    }
+                }
+                break;                
             }
-
-            if(isalpha(message[k]) || message[k] == ' ' || isTheSymbolPunctuation(message[k]))
-            {
-                // we add to our matrix only spaces and characters from the alphabet (letters)
-                matrix[i][j] = message[k];
-                ++j;
-            }
-
             ++k;
         }
     }
@@ -80,90 +79,64 @@ std::string encrypt_ctc(const std::string& message, const std::string& keyword, 
         // getting the encrypted text from the matrix column using permutated key
         for (int i = 0; i < row; ++i)
         {
-            if (isalpha(matrix[i][j]) || matrix[i][j] == ' ' || matrix[i][j] == '_' || isTheSymbolPunctuation(matrix[i][j]))
-            {
-                encryptedString += matrix[i][j];
-            }
+            encryptedString += matrix[i][j];
         }
     }
-
-
     return encryptedString;
 }
 
-std::map<int, int> getPermutationOrder(const std::string& keyword)
+std::vector<std::pair<int, int>> getPermutationOrder(const std::string& keyword)
 {
-    std::map<int, int> keyMap;
+    std::vector<std::pair<int, int>> keyMap;
 
-    // add an order of permutations to the map
     for (int i = 0; i < static_cast<int>(keyword.length()); ++i)
     {
-        keyMap[keyword[i]] = i;
+        keyMap.push_back(std::make_pair(keyword[i], i));    
     }
+
+    // sort our vector
+    std::sort(keyMap.begin(), keyMap.end());
 
     return keyMap;
 }
 
-bool isTheSymbolPunctuation(const char& c)
-{
-    for (const auto& it : punctuation)
-    {
-        if (it == c)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-std::string decrypt_ctc(const std::string& message, const std::string& keyword, std::map<int, int> keyMap)
+std::string decrypt_ctc(const std::string& message, const std::string& keyword, const std::vector<std::pair<int, int>>& keyMap)
 {
     // calculate row and column for the cipher matrix
-    int col = keyword.length();
+    int row = keyword.length();
 
-    int row = message.length() / col;
+    int col = message.length() / row;
 
     char cipherMat [row][col];
 
-    // add the characther to the column to the matrix
-    for (int j = 0, k = 0; j < col; ++j)
+    // add the character to the column to the matrix
+    for (int i = 0, k = 0; i < row; ++i)
     {
-        for (int i = 0; i < row; ++i)
+        for (int j = 0; j < col; ++j)
         {
             cipherMat[i][j] = message[k++];
         }
     }
 
-    // update order of keys for decryption
-    int index = 0;
-    for (auto it = keyMap.begin(); it != keyMap.end(); ++it)
-    {
-        it->second = index++;
-    }
-    
-    // arrange the column of the matrix according to the order of permutations by adding to the new matrix
-    char decCipher[row][col];
-
-    // std::map<int, int>::iterator ii = keyMap.begin();
-    int k = 0;
-    for (int l = 0, j; keyword[l] != '\0'; ++k)
-    {
-        j = keyMap[keyword[l++]];
-        for (int i = 0; i < row; ++i)
-        {
-            decCipher[i][k] = cipherMat[i][j];
-        }
-    }
-
-    // get message using matrix
     std::string decryptedString;
+
+    char decryptedMatrix[row][col];
+
     for (int i = 0; i < row; ++i)
     {
         for (int j = 0; j < col; ++j)
         {
-            if (decCipher[i][j] != '_')
+            decryptedMatrix[keyMap[i].second][j] = cipherMat[i][j];
+        }
+    }
+
+    for (int j = 0; j < col; ++j)
+    {
+        for (int i = 0; i < row; ++i)
+        {
+            if (decryptedMatrix[i][j] != '_')
             {
-                decryptedString += decCipher[i][j];
+                decryptedString += decryptedMatrix[i][j];
             }
         }
     }
