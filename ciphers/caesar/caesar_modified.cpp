@@ -18,6 +18,8 @@ std::string caesar_modified(const bool& bDecrypt, const std::string& message, co
 
     std::pair<int, int> p;
 
+    shift = shift % 26;
+
     // decrypt the message
     if (bDecrypt)
     {
@@ -39,15 +41,7 @@ std::string caesar_modified(const bool& bDecrypt, const std::string& message, co
             }
             else
             {
-                char letter = checkPunctuation(it);
-                if (letter != -1)
-                {
-                    returnedString.push_back(letter);
-                }
-                else
-                {
-                    returnedString.push_back(' ');
-                }
+                returnedString.push_back(it);
             }
         }
     }
@@ -77,15 +71,7 @@ std::string caesar_modified(const bool& bDecrypt, const std::string& message, co
             }
             else
             {
-                char letter = checkPunctuation(it);
-                if (letter != -1)
-                {
-                    returnedString.push_back(letter);
-                }
-                else
-                {
-                    returnedString.push_back(' ');
-                }
+                returnedString.push_back(it);
             }
         }
     }
@@ -122,4 +108,38 @@ char checkPunctuation(const char& letter)
         }
     }
     return -1;
+}
+
+std::string bruteforceCaesarModified(const bool& bDecrypt, const std::string& message, const std::string& keyword)
+{
+    std::string returnedString = "";
+    std::pair<int, int> p;
+
+    for (int shift = 1; shift < 26; ++shift)
+    {
+        returnedString += std::to_string(shift) + ". ";
+        for (const auto& it : message)
+        {
+            p = is_in_alphabet(it);
+            if (p.first != -1)
+            {
+                // if returned value isn't -1, then we found alphabet and number of letter in this alphabet
+                // which means we only need to shift characters to the right
+                if (p.second + shift >= static_cast<int>(AllAlphabets[p.first].size()))
+                {
+                    returnedString.push_back(AllAlphabets[p.first][(p.second + shift + AllAlphabets[p.first].size()) % AllAlphabets[p.first].size()]);
+                }
+                else
+                {
+                    returnedString.push_back(AllAlphabets[p.first][p.second + shift]);
+                }
+            }
+            else
+            {
+                returnedString.push_back(it);
+            }
+        }
+        returnedString += "\n";
+    }
+    return returnedString;
 }

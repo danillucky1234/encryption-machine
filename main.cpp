@@ -58,7 +58,12 @@ int main(int argc, char** argv)
 	{
 		CommandLineArguments::keyword = std::to_string(3);
 	}
-	// if user specified the keyword in the arguments, we don't need ask the key
+	// if the '-b' option enabled and we use caesar-modified cipher, we don't need key
+	else if (CommandLineArguments::bBrute && !strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[2].c_str()))
+	{
+		CommandLineArguments::keyword = "";
+	}
+	// also if user specified the keyword in the arguments, we don't need ask the key
 	else if (CommandLineArguments::keyword.length() == 0)
 	{
 		CommandLineArguments::keyword = getKeywordFromUser();
@@ -126,7 +131,14 @@ int main(int argc, char** argv)
 	}
 	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[2].c_str()))
 	{
-		cipherFunction = caesar_modified;
+		if (CommandLineArguments::bBrute)
+		{
+			cipherFunction = bruteforceCaesarModified;
+		}
+		else
+		{
+			cipherFunction = caesar_modified;
+		}
 	}
 	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[3].c_str()))
 	{
@@ -292,9 +304,18 @@ void parseArguments(const std::vector<std::string>& vec)
 		{
 			CommandLineArguments::bDecrypt = true;
 		}
+		else if ( !strcmp(vec[i].c_str(), "-h") || !strcmp(vec[i].c_str(), "--help") )
+		{
+			CommandLineArguments::bHelp = true;
+			break;
+		}
 		else if( !strcmp(vec[i].c_str(), "-q") || !strcmp(vec[i].c_str(), "--quiet") )
 		{
 			CommandLineArguments::bQuiet = true;
+		}
+		else if ( !strcmp(vec[i].c_str(), "-b") || !strcmp(vec[i].c_str(), "--bruteforce"))
+		{
+			CommandLineArguments::bBrute = true;
 		}
 		else if( !strcmp(vec[i].c_str(), "-i") || !strcmp(vec[i].c_str(), "--input") )
 		{	
@@ -423,11 +444,6 @@ void parseArguments(const std::vector<std::string>& vec)
 				throw static_cast<std::string>("Incorrect usage of the -k option");
 			}
 		}
-		else if ( !strcmp(vec[i].c_str(), "-h") || !strcmp(vec[i].c_str(), "--help") )
-		{
-			CommandLineArguments::bHelp = true;
-			break;
-		}
 	}
 }
 
@@ -475,10 +491,11 @@ void printHelpMessage()
 	std::cout << CColors::BLUE + "\t-h, --help\t\t\t\t\t\tShow this help message and exit\n" + CColors::WHITE;
 	std::cout << "\t-m \"some text\", --message \"some text\"\t\t\tMessage which will be encrypted\n";
 	std::cout << CColors::BLUE + "\t-c \"name of the cipher\", --cipher \"name of the cipher\"\tCipher name (method)\n" + CColors::WHITE;
-	std::cout << "\t-k \"some text\", --keyword \"some text\"\t\t\tKeyword that is required for some ciphers\n";
-	std::cout << CColors::BLUE + "\t-i <path/to/the/file>, --input <path/to/the/file>\tPath to the file which will be encrypted/decrypted\n" + CColors::WHITE;
-	std::cout << "\t-o <path/to/the/file>, --output <path/to/the/file>\tPath to the output file where the encrypted/decrypted message will be saved\n";
-	std::cout << CColors::BLUE + "\t-q, --quiet\t\t\t\t\t\tThe qiet output. " + CColors::RED + "Important note: this option requires these parameters:\n";
+	std::cout << "\t-b, --bruteforce\t\t\t\t\tUse brute force for crack caesar-modified cipher (key doesn\'t required)\n"; 
+	std::cout << CColors::BLUE + "\t-k \"some text\", --keyword \"some text\"\t\t\tKeyword that is required for some ciphers\n" + CColors::WHITE;
+	std::cout << "\t-i <path/to/the/file>, --input <path/to/the/file>\tPath to the file which will be encrypted/decrypted\n";
+	std::cout << CColors::BLUE + "\t-o <path/to/the/file>, --output <path/to/the/file>\tPath to the output file where the encrypted/decrypted message will be saved\n" + CColors::WHITE;
+	std::cout << "\t-q, --quiet\t\t\t\t\t\tThe qiet output. " + CColors::RED + "Important note: this option requires these parameters:\n";
 	std::cout << CColors::BLUE + "\t\t\t\t\t\t\t\tIf you want to encrypt the message/file without any output\n" + CColors::WHITE;
 	std::cout << "\t\t\t\t\t\t\t\t\t1) -m(--message) or -i(--input)\n";
 	std::cout << "\t\t\t\t\t\t\t\t\t2) -c(--cipher)\n";
@@ -498,7 +515,8 @@ void printHelpMessage()
 
 	std::cout << CColors::BLUE + "Note:\t If you use a caesar-modified cipher, use a number instead of the key to set the shift. For example:\n" + CColors::WHITE;
 	std::cout << "./encryption-machine -c caesar-modified -k 5 -o encryptedMessage.txt -i inputCaesarCipher.txt\n";
-	std::cout << CColors::BLUE + "If you write a word or phrase in the keyword instead of a number, a shift will be used with the size of the number of characters in the string\n\n" + CColors::WHITE;
+	std::cout << CColors::BLUE + "If you write a word or phrase in the keyword instead of a number, a shift will be used with the size of the number of characters in the string\n" + CColors::WHITE;
+	std::cout << CColors::BLUE + "If you want to decrypt a cipher message, but you don\'t know the shift (key), you can use bruteforce (check option -b). BruteForce works only with caesar-modified cipher\n\n" + CColors::WHITE;
 	
 	std::cout << CColors::BLUE + "Note 2:\t All cipher names are written in small letters\n\n" + CColors::WHITE;
 
