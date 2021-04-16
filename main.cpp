@@ -1,22 +1,7 @@
 #include "stdafx.h"
+#include "main.h"
 #include "ciphers/caesar/caesar_modified.h"
 #include "ciphers/ctc/ctc.h"
-
-namespace CommandLineArguments
-{
-    // string vars
-    std::string inputFilePath   = "";
-    std::string outputFilePath  = "";
-    std::string keyword         = "";
-    std::string cipherMethod    = "";
-    std::string message         = "";
-
-    // bool vars
-    bool bDecrypt                = false;    // if no '-d' parameter is specified, we will encrypt the file
-    bool bQuiet                  = false;    // originally we will print some messages
-    bool bHelp                   = false;    // should we print the help message or not
-    bool bBrute                  = false;    // bruteforce for caesar-modified cipher
-}
 
 void printStartMessageTitle();									// print the title 'Encrypt machine'
 void parseArguments(const std::vector<std::string>& vec);		// take all the arguments and turn them into options
@@ -69,6 +54,33 @@ int main(int argc, char** argv)
 		CommandLineArguments::cipherMethod = getCipherMethodFromUser();
 	}
 
+	// we should write to the CommandLineArguments::keyword out keyword, if user specified '-ki' option
+	if (CommandLineArguments::keywordInputFilePath.length() != 0)
+	{
+		// we are sure that the file is not empty, because we have already checked it, so we can do an integrity check on the file and then read data from it
+		std::stringstream tmpStringStream;
+
+		// open the filestream
+		std::ifstream file;
+        file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		
+		try
+		{
+			file.open(CommandLineArguments::keywordInputFilePath);
+		}
+		catch (const std::ifstream::failure& ex)
+		{
+			// checking for opening files
+			std::cerr << "Error while opening the keyword-input file!\n";
+            std::cerr << "Error code: " << ex.what() << '\n';
+			return -1;
+		}
+
+		tmpStringStream << file.rdbuf();
+		CommandLineArguments::keyword = tmpStringStream.str();
+		file.close();
+	} 
+	
 	// if the cipher method is caesar's cipher, we call the caesar's modified cipher, but with the keyword - 3, even if the keyword was specified in the arguments
 	if ( !strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[0].c_str()))
 	{
@@ -79,8 +91,8 @@ int main(int argc, char** argv)
 	{
 		CommandLineArguments::keyword = "";
 	}
-	// also if user specified the keyword in the arguments, we don't need ask the key
-	else if (CommandLineArguments::keyword.length() == 0)
+	// also if user specified the keyword in the arguments (or specified the path to the key), we don't need ask the key
+	else if (CommandLineArguments::keyword.length() == 0 && CommandLineArguments::keywordInputFilePath.length() == 0)
 	{
 		CommandLineArguments::keyword = getKeywordFromUser();
 	}
@@ -382,6 +394,55 @@ void parseArguments(const std::vector<std::string>& vec)
 				throw static_cast<std::string>("Incorrect usage of the -i option");
 			}
 		}
+		else if ( !strcmp(vec[i].c_str(), "-ki") || !strcmp(vec[i].c_str(), "--keyword-input") )
+		{
+			std::string possibleException;
+			try
+			{
+				// check file does it exists
+				if (exists_test(vec.at(i + 1)))
+				{
+					std::ifstream file;
+					file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+					try
+					{
+						file.open(vec[i + 1]);
+					}
+					catch(const std::ifstream::failure& ex)
+					{
+            			std::cerr << "Error code: " << ex.what() << '\n';
+						possibleException = static_cast<std::string>("Error while opening the keyword-input file!\n");
+						throw possibleException; // we throw std::string
+					}
+					// check file is it empty
+					if(!fileIsEmpty(file))
+					{
+						CommandLineArguments::keywordInputFilePath = vec[i + 1];
+					}
+					else
+					{
+						possibleException = static_cast<std::string>("The keyword-input file is empty!");
+						throw possibleException; // we throw std::string
+					}
+					file.close();
+				}
+				else
+				{
+					possibleException =  static_cast<std::string>("The keyword-input file doesn't exist!\n");
+					throw possibleException; // we throw std::string
+				}
+			}
+			catch(const std::string& ex) // and if we catch this string, 
+			{								// we take it out of this function and send it to the main function,
+				throw ex;						// where another try-catch is waiting for it
+			}
+			catch(const std::out_of_range& ex)
+			{
+				std::cout << "Maybe you wrote the keyword-input file path in the wrong order, please recheck again. Use \"./encryption-machine -h\" to get detailed iformation!\n";
+				std::cout << "Out of range error: " << ex.what() << '\n';
+				throw static_cast<std::string>("Incorrect usage of the -ki option");
+			}
+		}
 		else if ( !strcmp(vec[i].c_str(), "-o") || !strcmp(vec[i].c_str(), "--output") )
 		{
 			std::string possibleException;
@@ -509,10 +570,11 @@ void printHelpMessage()
 	std::cout << CColors::BLUE + "\t-c \"name of the cipher\", --cipher \"name of the cipher\"\tCipher name (method)\n" + CColors::WHITE;
 	std::cout << "\t-b, --bruteforce\t\t\t\t\tUse brute force for crack caesar-modified cipher (key doesn\'t required)\n"; 
 	std::cout << CColors::BLUE + "\t-k \"some text\", --keyword \"some text\"\t\t\tKeyword that is required for some ciphers\n" + CColors::WHITE;
-	std::cout << "\t-i <path/to/the/file>, --input <path/to/the/file>\tPath to the file which will be encrypted/decrypted\n";
-	std::cout << CColors::BLUE + "\t-o <path/to/the/file>, --output <path/to/the/file>\tPath to the output file where the encrypted/decrypted message will be saved\n" + CColors::WHITE;
-	std::cout << "\t-q, --quiet\t\t\t\t\t\tThe qiet output. " + CColors::RED + "Important note: this option requires these parameters:\n";
-	std::cout << CColors::BLUE + "\t\t\t\t\t\t\t\tIf you want to encrypt the message/file without any output\n" + CColors::WHITE;
+	std::cout << "\t-ki <path/to/the/file>, --keyword-input <path/to/the/file>\tPath to the file, which will used as a keyword\n";
+	std::cout << CColors::BLUE + "\t-i <path/to/the/file>, --input <path/to/the/file>\tPath to the file which will be encrypted/decrypted\n" + CColors::WHITE;
+	std::cout << "\t-o <path/to/the/file>, --output <path/to/the/file>\tPath to the output file where the encrypted/decrypted message will be saved\n";
+	std::cout << CColors::BLUE + "\t-q, --quiet\t\t\t\t\t\tThe qiet output. " + CColors::RED + "Important note: this option requires these parameters:\n" + CColors::WHITE;
+	std::cout << CColors::BLUE + "\t\t\t\t\t\t\t\tIf you want to encrypt the message/file without any output\n";
 	std::cout << "\t\t\t\t\t\t\t\t\t1) -m(--message) or -i(--input)\n";
 	std::cout << "\t\t\t\t\t\t\t\t\t2) -c(--cipher)\n";
 	std::cout << "\t\t\t\t\t\t\t\t\t3) -k(--keyword)\n";
@@ -520,7 +582,8 @@ void printHelpMessage()
 	std::cout << "\t\t\t\t\t\t\t\t\t1) -d(--decrypt)\n";
 	std::cout << "\t\t\t\t\t\t\t\t\t2) -m(--message) or -i(--input)\n";
 	std::cout << "\t\t\t\t\t\t\t\t\t3) -c(--cipher)\n";
-	std::cout << "\t\t\t\t\t\t\t\t\t4) -k(--keyword)\n\n";
+	std::cout << "\t\t\t\t\t\t\t\t\t4) -k(--keyword)\n";
+	std::cout << CColors::RED + "\t\t\t\t\t\t\t\t\tNote:" + CColors::BLUE + "\tIf you using the caesar-modified cipher with \'-b\' option, you don\'t need to use the \'-k\' option\n\n" + CColors::WHITE;
 	
 
 	std::cout << CColors::RED + "All ciphers which you can use:\n" + CColors::WHITE;

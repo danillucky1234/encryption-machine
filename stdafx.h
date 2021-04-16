@@ -7,5 +7,3 @@
 #include <algorithm>
 #include <sys/stat.h>   // for func that checks if the file exists
 #include <stdexcept>    // std::out_of_range (while checking the file exists or not)
-
-#include "main.h"
