@@ -225,7 +225,7 @@ int main(int argc, char** argv)
 		if (!CommandLineArguments::bQuiet)
 		{
 			std::cout << CColors::GREEN << "The ";
-			if (CommandLineArguments::bDecrypt)
+			if (CommandLineArguments::bDecrypt || (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[2].c_str()) && CommandLineArguments::bBrute))
 			{
 				std::cout << "decrypted ";
 			}
@@ -234,7 +234,7 @@ int main(int argc, char** argv)
 				std::cout << "encrypted ";
 			}
 			std::cout << "data was successfully read. " << CColors::WHITE;
-			if (CommandLineArguments::bDecrypt)
+			if (CommandLineArguments::bDecrypt || (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[2].c_str()) && CommandLineArguments::bBrute))
 			{
 				std::cout << "Decrypted ";
 			}
@@ -283,7 +283,7 @@ std::string getCipherMethodFromUser()
 		std::cout << CColors::GREEN + "\t[0] " + CColors::BLUE + "Caesar\'s\n" + CColors::WHITE;
 		std::cout << CColors::GREEN + "\t[1] " + CColors::BLUE + "Column Transposition\n" + CColors::WHITE;
 		std::cout << CColors::GREEN + "\t[2] " + CColors::BLUE + "Caesar\'s modified\n" + CColors::WHITE;
-		std::cout << CColors::GREEN + "\t[3] " + CColors::BLUE + "Hill\'s\n\n" + CColors::WHITE;
+		std::cout << CColors::GREEN + "\t[3] " + CColors::BLUE + "Hill\'s\n" + CColors::WHITE;
 		std::cout << CColors::GREEN + "\t[4] " + CColors::BLUE + "Vigenere\n\n" + CColors::WHITE;
 		
 		std::cout << "Enter the option:\n" + CColors::RED + "\t[>] " + CColors::WHITE;
@@ -317,6 +317,7 @@ std::string getKeywordFromUser()
 	std::cout << CColors::GREEN + "[+] " + CColors::BLUE + "Enter the keyword (it could be a phrase or the number (if the cipher method is caesar\'s-modified)): \n" + CColors::WHITE;
 	std::cout << CColors::RED + "\t[>] " + CColors::WHITE;
 	std::getline(std::cin, keyword);
+	std::cout << '\n';
 	return keyword;
 }
 
@@ -326,6 +327,7 @@ std::string getMessageFromUser()
 	std::cout << CColors::GREEN + "[+] " + CColors::BLUE + "Enter the message (it could be a phrase): \n" + CColors::WHITE;
 	std::cout << CColors::RED + "\t[>] " + CColors::WHITE;
 	std::getline(std::cin, message);
+	std::cout << '\n';
 	return message;
 }
 
@@ -596,7 +598,8 @@ void printHelpMessage()
 	std::cout << "\t- caesar\n";
 	std::cout << "\t- ctc\n";
 	std::cout << "\t- caesar-modified\n";
-	std::cout << "\t- hill\n\n";
+	std::cout << "\t- hill\n";
+	std::cout << "\t- vigenere\n\n";
 
 	std::cout << CColors::BLUE + "Note:\t If you use a caesar-modified cipher, use a number instead of the key to set the shift. For example:\n" + CColors::WHITE;
 	std::cout << "./encryption-machine -c caesar-modified -k 5 -o encryptedMessage.txt -i inputCaesarCipher.txt\n";
@@ -617,5 +620,8 @@ void printHelpMessage()
 	std::cout << "$ ./encryption-machine\n";
 	std::cout << "$ ./encryption-machine -c caesar -m \"Message which will be encrypted\" -o encryptedMessage.txt\n";
 	std::cout << "$ ./encryption-machine -i ~/Desktop/fileToDecrypt.txt -d -o decryptedMessage.txt\n";
+	std::cout << "$ ./encryption-machine -ki ~/Desktop/keyword.txt -c vigenere -o output.txt -m \"This message will be encrypted using Vigenere cipher!\"\n";
+	std::cout << "$ ./encryption-machine -c caesar-modified -b -d -i input.txt\n";
+	std::cout << "$ ./encryption-machine -c ctc -k \"This is a keyword\" -m \"Linus Torvalds is a genius\" -q\n";
 }
 

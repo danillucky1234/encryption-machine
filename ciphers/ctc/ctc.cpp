@@ -2,12 +2,12 @@
 
 std::string ctc(const bool& bDecrypt, const std::string& message, const std::string& keyword)
 {
-    int cheker;
+    int checker;
     // check converting string to int
     try
     {
         // if successful convert - keyword is a number, so we should throw an error
-        cheker = std::stoi(keyword);
+        checker = std::stoi(keyword);
         throw static_cast<std::string>("This cipher requires an string keyword!\n");
     }
     catch(const std::invalid_argument& ia)
