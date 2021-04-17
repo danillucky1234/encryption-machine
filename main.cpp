@@ -2,6 +2,7 @@
 #include "main.h"
 #include "ciphers/caesar/caesar_modified.h"
 #include "ciphers/ctc/ctc.h"
+#include "ciphers/vigenere/vigenere.h"
 
 void printStartMessageTitle();									// print the title 'Encrypt machine'
 void parseArguments(const std::vector<std::string>& vec);		// take all the arguments and turn them into options
@@ -170,7 +171,11 @@ int main(int argc, char** argv)
 	}
 	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[3].c_str()))
 	{
-		// (*cipherFunction) = hill;
+		// cipherFunction = hill;
+	}
+	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[4].c_str()))
+	{
+		cipherFunction = vigenere;
 	}
 
 	std::string returnedString;
@@ -279,6 +284,7 @@ std::string getCipherMethodFromUser()
 		std::cout << CColors::GREEN + "\t[1] " + CColors::BLUE + "Column Transposition\n" + CColors::WHITE;
 		std::cout << CColors::GREEN + "\t[2] " + CColors::BLUE + "Caesar\'s modified\n" + CColors::WHITE;
 		std::cout << CColors::GREEN + "\t[3] " + CColors::BLUE + "Hill\'s\n\n" + CColors::WHITE;
+		std::cout << CColors::GREEN + "\t[4] " + CColors::BLUE + "Vigenere\n\n" + CColors::WHITE;
 		
 		std::cout << "Enter the option:\n" + CColors::RED + "\t[>] " + CColors::WHITE;
 		std::cin >> tmpStr;

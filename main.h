@@ -27,4 +27,6 @@ namespace CommandLineArguments
     bool bBrute  				= false;    // bruteforce for caesar-modified cipher
 }
 
+const std::vector<std::string> namesOfTheCiphersWhichAreAllowed = {"caesar", "ctc", "caesar-modified", "hill", "vigenere"};
+
 #endif
