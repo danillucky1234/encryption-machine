@@ -1,8 +1,12 @@
+# Contributors  
+## [Oleksandr Cherkas](https://github.com/Oleksandr-Cherkas "Yeah, i`m a contributor")
+<br>  
+
 # Installation
 1. `git clone git@github.com:danillucky1234/encryption-machine.git`  
 or  
 `git clone https://github.com/danillucky1234/encryption-machine.git`
-2. `g++ main.cpp ciphers/caesar/caesar_modified.cpp ciphers/ctc/ctc.cpp ciphers/vigenere/vigenere.cpp -Wall -std=c++17 -o encryption-machine`
+2. `g++ main.cpp ciphers/caesar/caesar_modified.cpp ciphers/ctc/ctc.cpp ciphers/vigenere/vigenere.cpp ciphers/Hill/Hill.cpp -Wall -std=c++17 -o encryption-machine`
 3. `./encryption-machine -h`
 
 ## Usage
@@ -23,7 +27,7 @@ Option | Meaning
 - Caesar's cipher
 - Column Transposition Cipher
 - Caesar-modified cipher
-- Hill's cipher (scroll down and the the note)
+- Hill's cipher
 - Vigenere
 
 
@@ -41,7 +45,7 @@ Option | Meaning
     <img src="pics/decryptedFirstExample.png">
 </p>
 
-- If we will try to start program without any option, we will get this message and encrypt it:
+- If we will try to start program without any option, we will get this message and encrypt it:  
 `./encryption-machine`
 
 <p align = "center">
@@ -58,7 +62,7 @@ Option | Meaning
 ### If we use caesar-modified cipher
 - `./encryption-machine -c caesar-modified -m "I like the white ducks in the bathtub" -k 18 -o output.txt -q`  
 Output:  
-`The encrypted data was successfully read and written to the file output.txt`
+`The encrypted data was successfully read and written to the file output.txt`  
 Contents of the output.txt file:  
 `Q tqsm bpm epqbm lcksa qv bpm jibpbcj`
 
@@ -70,8 +74,6 @@ Contents of the output.txt file:
 </p>
 
 And we can see the right decrypted message in the row 18
-
-<span style="color:red;">Note:</span> <span style="color:yellow;">Unfortunately, the Hill method is not yet ready, but we can assure you that our best cotributor is working on it as hard as he can. Soon everything will be fixed and our cipher machine will be updated with new methods</span>
 
 ## Reporting bugs
 If you encounter a bug, do not hesitate to report it in our Issue Tracker. When reporting a problem, please keep the following in mind:
