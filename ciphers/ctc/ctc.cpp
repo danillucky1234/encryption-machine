@@ -2,7 +2,7 @@
 
 std::string ctc(const bool& bDecrypt, const std::string& message, const std::string& keyword)
 {
-    int checker;
+    int checker __attribute__((unused)); // because g++ compiler throw warning about this variable not used
     // check converting string to int
     try
     {

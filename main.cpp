@@ -3,6 +3,7 @@
 #include "ciphers/caesar/caesar_modified.h"
 #include "ciphers/ctc/ctc.h"
 #include "ciphers/vigenere/vigenere.h"
+#include "ciphers/Hill/Hill.h"
 
 void printStartMessageTitle();									// print the title 'Encrypt machine'
 void parseArguments(const std::vector<std::string>& vec);		// take all the arguments and turn them into options
@@ -171,7 +172,7 @@ int main(int argc, char** argv)
 	}
 	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[3].c_str()))
 	{
-		// cipherFunction = hill;
+		cipherFunction = hill;
 	}
 	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[4].c_str()))
 	{

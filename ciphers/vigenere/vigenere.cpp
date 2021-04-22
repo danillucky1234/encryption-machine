@@ -2,7 +2,7 @@
 
 std::string vigenere(const bool& bDecrypt, const std::string& message, const std::string& keyword)
 {
-    int checker;
+    int checker __attribute__((unused));    // for g++ complier. Thanks to this attribute we can to get rid of warning of unused variable 
     // check converting string to int
     try
     {

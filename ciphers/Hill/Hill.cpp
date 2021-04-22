@@ -1,6 +1,6 @@
-#include "hill.h"
+#include "Hill.h"
 
-std::string hill(bool bDecrypt, std::string message, std::string keyword)
+std::string hill(const bool& bDecrypt, const std::string& message, const std::string& keyword)
 {
     std::string messageReturn = "";
     int x = sqrt(keyword.length());
@@ -26,7 +26,7 @@ std::string hill(bool bDecrypt, std::string message, std::string keyword)
         }
         else
         {
-            int punkt = checkPunctuation(it);
+            int punkt = checkPunctuationInt(it);
             if (punkt != -1)
             {
                 stringMessage.push_back(52 + punkt);
@@ -54,7 +54,7 @@ std::string hill(bool bDecrypt, std::string message, std::string keyword)
         }
         else
         {
-            int punkt = checkPunctuation(it);
+            int punkt = checkPunctuationInt(it);
             if (punkt != -1)
             {
                 stringKey.push_back(52 + punkt);
@@ -290,7 +290,7 @@ std::pair<int, int> is_in_alphabet(const char& letter)
     return std::make_pair(-1, -1);
 }
 
-int checkPunctuation(const char& letter)
+int checkPunctuationInt(const char& letter)
 {
     for (int j = 0; j < static_cast<int>(punctuation.size()); ++j)
     {

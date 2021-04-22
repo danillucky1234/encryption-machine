@@ -25,7 +25,7 @@ std::string caesar_modified(const bool& bDecrypt, const std::string& message, co
     {
         for (const auto& it : message)
         {
-            p = is_in_alphabet(it);
+            p = is_in_alphabet_caesar(it);
             if (p.first != -1)
             {
                 // if returned value isn't -1, then we found alphabet and number of letter in this alphabet
@@ -49,7 +49,7 @@ std::string caesar_modified(const bool& bDecrypt, const std::string& message, co
     {
         for (const auto& it : message)
         {
-            p = is_in_alphabet(it);
+            p = is_in_alphabet_caesar(it);
             if (p.first != -1)
             {
                 if (p.second + shift >= static_cast<int>(AllAlphabets[p.first].size()))
@@ -79,10 +79,10 @@ std::string caesar_modified(const bool& bDecrypt, const std::string& message, co
     return returnedString;
 }
 
-// returned value:
-//  int1:   number of alphabet from the vector AllAlphabets (English - 0, EnglishUpperLettes - 1)
-//  int2:   number of letter in alphabet (a - 0, b - 1, ..., z - 25) 
-std::pair<int, int> is_in_alphabet(const char& letter)
+// // returned value:
+// //  int1:   number of alphabet from the vector AllAlphabets (English - 0, EnglishUpperLettes - 1)
+// //  int2:   number of letter in alphabet (a - 0, b - 1, ..., z - 25) 
+std::pair<int, int> is_in_alphabet_caesar(const char& letter)
 {
     for (int i = 0; i < static_cast<int>(AllAlphabets.size()); ++i)
     {
@@ -120,7 +120,7 @@ std::string bruteforceCaesarModified(const bool& bDecrypt, const std::string& me
         returnedString += std::to_string(shift) + ". ";
         for (const auto& it : message)
         {
-            p = is_in_alphabet(it);
+            p = is_in_alphabet_caesar(it);
             if (p.first != -1)
             {
                 // if returned value isn't -1, then we found alphabet and number of letter in this alphabet

@@ -6,7 +6,7 @@
 1. `git clone git@github.com:danillucky1234/encryption-machine.git`  
 or  
 `git clone https://github.com/danillucky1234/encryption-machine.git`
-2. `g++ main.cpp ciphers/caesar/caesar_modified.cpp ciphers/ctc/ctc.cpp ciphers/vigenere/vigenere.cpp -Wall -std=c++17 -o encryption-machine`
+2. `g++ main.cpp ciphers/*/*.cpp -Wall -std=c++17 -o encryption-machine`
 3. `./encryption-machine -h`
 
 ## Usage
