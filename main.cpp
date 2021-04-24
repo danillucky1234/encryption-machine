@@ -4,6 +4,7 @@
 #include "ciphers/ctc/ctc.h"
 #include "ciphers/vigenere/vigenere.h"
 #include "ciphers/Hill/Hill.h"
+#include "ciphers/morse/morse.h"
 
 void printStartMessageTitle();									// print the title 'Encrypt machine'
 void parseArguments(const std::vector<std::string>& vec);		// take all the arguments and turn them into options
@@ -93,6 +94,11 @@ int main(int argc, char** argv)
 	{
 		CommandLineArguments::keyword = "";
 	}
+	// if we use morse code, we don't need key
+	else if ( !strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[5].c_str()) )
+	{
+		CommandLineArguments::keyword = "";
+	}
 	// also if user specified the keyword in the arguments (or specified the path to the key), we don't need ask the key
 	else if (CommandLineArguments::keyword.length() == 0 && CommandLineArguments::keywordInputFilePath.length() == 0)
 	{
@@ -151,15 +157,15 @@ int main(int argc, char** argv)
 	std::string (*cipherFunction)(const bool&, const std::string&, const std::string&);
 
 
-	if ( !strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[0].c_str()))
+	if ( !strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[0].c_str()) )
 	{
 		cipherFunction = caesar_modified;
 	}
-	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[1].c_str()))
+	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[1].c_str()) )
 	{
 		cipherFunction = ctc;
 	}
-	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[2].c_str()))
+	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[2].c_str()) )
 	{
 		if (CommandLineArguments::bBrute)
 		{
@@ -170,14 +176,19 @@ int main(int argc, char** argv)
 			cipherFunction = caesar_modified;
 		}
 	}
-	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[3].c_str()))
+	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[3].c_str()) )
 	{
 		cipherFunction = hill;
 	}
-	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[4].c_str()))
+	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[4].c_str()) )
 	{
 		cipherFunction = vigenere;
 	}
+	else if (!strcmp(CommandLineArguments::cipherMethod.c_str(), namesOfTheCiphersWhichAreAllowed[5].c_str()) )
+	{
+		cipherFunction = morse;
+	}
+
 
 	std::string returnedString;
 	try
@@ -285,7 +296,8 @@ std::string getCipherMethodFromUser()
 		std::cout << CColors::GREEN + "\t[1] " + CColors::BLUE + "Column Transposition\n" + CColors::WHITE;
 		std::cout << CColors::GREEN + "\t[2] " + CColors::BLUE + "Caesar\'s modified\n" + CColors::WHITE;
 		std::cout << CColors::GREEN + "\t[3] " + CColors::BLUE + "Hill\'s\n" + CColors::WHITE;
-		std::cout << CColors::GREEN + "\t[4] " + CColors::BLUE + "Vigenere\n\n" + CColors::WHITE;
+		std::cout << CColors::GREEN + "\t[4] " + CColors::BLUE + "Vigenere\n" + CColors::WHITE;
+		std::cout << CColors::GREEN + "\t[5] " + CColors::BLUE + "Morse code\n\n" + CColors::WHITE;
 		
 		std::cout << "Enter the option:\n" + CColors::RED + "\t[>] " + CColors::WHITE;
 		std::cin >> tmpStr;
@@ -600,7 +612,9 @@ void printHelpMessage()
 	std::cout << "\t- ctc\n";
 	std::cout << "\t- caesar-modified\n";
 	std::cout << "\t- hill\n";
-	std::cout << "\t- vigenere\n\n";
+	std::cout << "\t- vigenere\n";
+	std::cout << "\t- morse\n\n";
+
 
 	std::cout << CColors::BLUE + "Note:\t If you use a caesar-modified cipher, use a number instead of the key to set the shift. For example:\n" + CColors::WHITE;
 	std::cout << "./encryption-machine -c caesar-modified -k 5 -o encryptedMessage.txt -i inputCaesarCipher.txt\n";

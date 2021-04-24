@@ -1,3 +1,6 @@
 encryption-machine
 .vscode/
 test/
+input.txt
+keyword.txt
+output.txt

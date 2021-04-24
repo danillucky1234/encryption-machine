@@ -29,6 +29,7 @@ Option | Meaning
 - Caesar-modified cipher
 - Hill's cipher
 - Vigenere
+- Morse code
 
 
 ## Examples
