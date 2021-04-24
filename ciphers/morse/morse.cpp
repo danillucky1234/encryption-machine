@@ -33,15 +33,16 @@ std::string decrypt_morse (const std::string& message)
     std::string decryptedMessage;
     std::string letter;
     int j;
-
-    for (int i = 0; i < static_cast<int>(message.length()); ++i)
+    std::string newMessage = message;
+    newMessage += ' '; // we add a space at the end of the message so that we can finish our iteration on the message 
+    for (int i = 0; i < static_cast<int>(newMessage.length()); ++i)
     {
         letter = "";
         j = 0;
 
-        while (message[i + j] != ' ')
+        while (newMessage[i + j] != ' ')
         {
-            letter += message[i + j];
+            letter += newMessage[i + j];
             ++j;
         }
         if (j != 0)
@@ -52,7 +53,7 @@ std::string decrypt_morse (const std::string& message)
         }
         else
         {
-            if (message[i + 1] == ' ' && message[i + 2] == ' ')
+            if (newMessage[i + 1] == ' ' && newMessage[i + 2] == ' ')
             {
                 decryptedMessage += ' ';
             }
