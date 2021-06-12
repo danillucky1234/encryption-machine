@@ -51,6 +51,12 @@ int main(int argc, char** argv)
 		printStartMessageTitle();
 	}
 
+	// if user wants decrypt smth using brute, we know that cipher method is caesar
+	if (CommandLineArguments::bDecrypt && CommandLineArguments::bBrute)
+	{
+			CommandLineArguments::cipherMethod = namesOfTheCiphersWhichAreAllowed[0];
+	}
+
 	// if nothing is specified, we ask the user which cipher he wants to use
 	if (CommandLineArguments::cipherMethod.length() == 0)
 	{
